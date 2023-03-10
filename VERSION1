@@ -1,0 +1,277 @@
+#include <SoftwareSerial.h>
+#include <Servo.h>
+#include <Ultrasonic.h>
+
+Ultrasonic ultrasonic1(A6, A7);
+// Motor pins
+const int MOTOR_A_ENA = 2;
+const int MOTOR_A_IN1 = 3;
+const int MOTOR_A_IN2 = 4;
+const int MOTOR_B_IN3 = 5;
+const int MOTOR_B_IN4 = 6;
+const int MOTOR_B_ENB = 7;
+
+// Servo pins
+const int TRAIN_SERVO_PIN = 8;
+const int TOP_SERVO_PIN = 10;
+const int BOTTOM_SERVO_PIN = 11;
+const int SHOULDER_SERVO_PIN = 9;
+const int BASE_SERVO_PIN = 12;
+
+
+// Servo angles
+const int TOP_OPEN_ANGLE_LEFT = 180;
+const int TOP_OPEN_ANGLE_RIGHT = 0;
+const int TOP_CLOSE_ANGLE = 90;
+const int BOTTOM_OPEN_ANGLE = 100;
+const int BOTTOM_CLOSE_ANGLE = 0;
+
+const int SHOULDER_ANGLES[] = {18, 37, 44, 51, 58, 65, 72, 79, 86, 93, 101, 108};
+const int BASE_ANGLES[] = {0, 20, 35, 50, 70, 85, 90, 100, 120, 140, 160, 180};
+
+int pos;
+
+Servo topServo;
+Servo bottomServo;
+Servo shoulderServo;
+Servo baseServo;
+Servo trainServo;
+
+void setup() {
+  Serial.begin(9600);
+  
+  topServo.attach(TOP_SERVO_PIN);
+  bottomServo.attach(BOTTOM_SERVO_PIN);
+  shoulderServo.attach(SHOULDER_SERVO_PIN);
+  baseServo.attach(BASE_SERVO_PIN);
+  trainServo.attach(TRAIN_SERVO_PIN);
+
+  pinMode(MOTOR_A_ENA, OUTPUT);
+  pinMode(MOTOR_A_IN1, OUTPUT);
+  pinMode(MOTOR_A_IN2, OUTPUT);
+  pinMode(MOTOR_B_ENB, OUTPUT);
+  pinMode(MOTOR_B_IN3, OUTPUT);
+  pinMode(MOTOR_B_IN4, OUTPUT);
+
+  digitalWrite(MOTOR_A_ENA, LOW);
+  digitalWrite(MOTOR_B_ENB, LOW);
+//   topServo.write(0);
+//  bottomServo.write(0);
+//  shoulderServo.write(150);
+//  baseServo.write(65);
+//  trainServo.write(90);
+}
+
+void setServoAngle(Servo& servo, const int angle) {
+  servo.write(angle);
+}
+
+void topOpenLeft() {
+  setServoAngle(topServo, TOP_OPEN_ANGLE_LEFT);
+}
+void topOpenRight() {
+  setServoAngle(topServo, TOP_OPEN_ANGLE_RIGHT);
+}
+
+void topClose() {
+  setServoAngle(topServo, TOP_CLOSE_ANGLE);
+}
+
+void bottomOpen() {
+  setServoAngle(bottomServo, BOTTOM_OPEN_ANGLE);
+}
+
+void bottomClose() {
+  setServoAngle(bottomServo, BOTTOM_CLOSE_ANGLE);
+}
+
+
+
+
+void Shoulder_Down() { 
+ for (pos = 133; pos <= 180; pos += 1) {
+    shoulderServo.write(pos);            
+    delay(15);                  
+  }
+}
+
+
+void Shoulder_UP() {
+  for (pos = 180; pos <= 133; pos -= 1) {
+    shoulderServo.write(pos);            
+    delay(15);                  
+  }
+}
+
+
+void Base_Middle(){
+   baseServo.write(65);
+    delay(15); 
+}
+void Base_LEFT() {
+  for (pos = 65; pos <= 135; pos += 1) {
+    baseServo.write(pos);            
+    delay(15);                  
+  }
+}
+
+
+ void Base_RIGHT(){
+  for (pos = 65; pos >= 0; pos -= 1) { 
+   baseServo.write(pos);             
+    delay(15);                      
+  }
+}
+
+
+void Base_Ball_1(){
+  for (pos = 65; pos >= 45; pos -= 1) { 
+    baseServo.write(pos);             
+    delay(15);                      
+  }
+}
+
+
+void Base_Ball_2(){
+   for (pos = 65; pos <= 100; pos += 1) {
+    baseServo.write(pos);            
+    delay(15);                  
+  }
+}
+
+
+void train_more(){
+  trainServo.write(100);
+ delay(20);
+ 
+ trainServo.write(90);
+}
+
+
+void train_less(){
+ trainServo.write(0);
+ delay(1000);
+trainServo.write(90);
+ delay(20);
+
+
+}
+
+void stopMotors() {
+  digitalWrite(MOTOR_A_ENA, LOW);
+  digitalWrite(MOTOR_B_ENB, LOW);
+}
+
+
+void forward(int speedB,int speedA) {
+  analogWrite(MOTOR_A_ENA, speedA);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speedB);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
+
+void turn_left(int speed) {
+  analogWrite(MOTOR_A_ENA, 0);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+
+void turn_right(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, 0);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+
+void backward(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
+
+void forward_left(int speed) {
+  analogWrite(MOTOR_A_ENA, speed * 0.8);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+
+void forward_right(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, speed * 0.8);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+
+void backward_left(int speed) {
+  analogWrite(MOTOR_A_ENA, speed * 0.8);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
+
+void backward_right(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speed * 0.8);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
+  
+
+  void loop() {
+  for (pos = 0; pos <= 180; pos += 1) {
+    topServo.write(pos);            
+    delay(15);                  
+  }
+  for (pos = 180; pos >= 0; pos -= 1) { 
+    topServo.write(pos);             
+    delay(15);                      
+  }
+
+//
+//    stopMotors();
+//    setShoulderAngle(180);
+//    setBaseAngle(135);
+//    topOpen();
+//    setShoulderAngle(100);
+//    topClose(); 
+//    setBaseAngle(170);
+//    bottomOpen();
+//    delay(1000);
+//    bottomClose();
+//   setBaseAngle(87);  
+//   setShoulderAngle(5);
+//   setBaseAngle(45); 
+//   topOpen();
+//   setShoulderAngle(100);
+//   topClose();
+//   setBaseAngle(0); 
+//   bottomOpen();
+//   delay(1000);
+//   bottomClose();
+//   setBaseAngle(87);  
+//   
+
+  }
+ 
+//sonic = ultrasonic1.read()
+// Serial.print("Sensor: ");
+//  Serial.print(ultrasonic1.read());
