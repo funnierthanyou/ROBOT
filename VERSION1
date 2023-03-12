@@ -8,9 +8,9 @@ const int MOTOR_B_IN3 = 5;
 const int MOTOR_B_IN4 = 6;
 
 // Servo angles
-const int TOP_OPEN_ANGLE_LEFT = 180;
-const int TOP_OPEN_ANGLE_RIGHT = 0;
-const int TOP_CLOSE_ANGLE = 90;
+const int TOP_OPEN_ANGLE_LEFT = 140;
+const int TOP_OPEN_ANGLE_RIGHT = 140;
+const int TOP_CLOSE_ANGLE = 0;
 const int BOTTOM_OPEN_ANGLE = 100;
 const int BOTTOM_CLOSE_ANGLE = 0;
 
@@ -35,7 +35,7 @@ double setpoint = 500.0;
 
 // Servo pins
 const int TOP_SERVO_PIN = 8;
-const int BOTTOM_SERVO_PIN = 11;
+const int BOTTOM_SERVO_PIN = 28;
 const int SHOULDER_SERVO_PIN = 9;
 const int BASE_SERVO_PIN = 10;
 const int TRAIN_SERVO_PIN = 24;
@@ -48,7 +48,6 @@ int m2 = 0;
 int m3 = 0;
 int m4 = 0;
 
-int pos;
 Servo topServo;
 Servo bottomServo;
 Servo shoulderServo;
@@ -57,430 +56,485 @@ Servo trainServo;
 
 void setServoAngle(Servo& servo, const int angle) {
   servo.write(angle);
-  }
-  void forward(int speed) {
-    analogWrite(MOTOR_A_ENA, speed);
-      digitalWrite(MOTOR_A_IN1, LOW);
-        digitalWrite(MOTOR_A_IN2, HIGH);
-    analogWrite(MOTOR_B_ENB, speed);
-      digitalWrite(MOTOR_B_IN3, HIGH);
-        digitalWrite(MOTOR_B_IN4, LOW);
-        }
-        void backward(int speed) {
-          analogWrite(MOTOR_A_ENA, speed);
-      digitalWrite(MOTOR_A_IN1, HIGH);
-        digitalWrite(MOTOR_A_IN2, LOW);
-          analogWrite(MOTOR_B_ENB, speed);
-            digitalWrite(MOTOR_B_IN3, LOW);
-        digitalWrite(MOTOR_B_IN4, HIGH);
-        }
-        void stoprobot () {
-          analogWrite(MOTOR_A_ENA, 0);
-            digitalWrite(MOTOR_A_IN1, LOW);
-              digitalWrite(MOTOR_A_IN2, LOW);
-          analogWrite(MOTOR_B_ENB, 0);
-            digitalWrite(MOTOR_B_IN3, LOW);
-              digitalWrite(MOTOR_B_IN4, LOW);
-              }
+}
+void forward(int speedA,int speedB) {
+  analogWrite(MOTOR_A_ENA, speedA);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speedB);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
+void backward(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+void stoprobot () {
+  analogWrite(MOTOR_A_ENA, 0);
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, 0);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
 
 void turn_left(int speed) {
   analogWrite(MOTOR_A_ENA, 30);
-    digitalWrite(MOTOR_A_IN1, LOW);
-      digitalWrite(MOTOR_A_IN2, HIGH);
-        analogWrite(MOTOR_B_ENB, speed);
-    digitalWrite(MOTOR_B_IN3, HIGH);
-      digitalWrite(MOTOR_B_IN4, LOW);
-      }
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
 
 void turn_right(int speed) {
   analogWrite(MOTOR_A_ENA, speed);
-    digitalWrite(MOTOR_A_IN1, LOW);
-      digitalWrite(MOTOR_A_IN2, HIGH);
-        analogWrite(MOTOR_B_ENB, 30);
-    digitalWrite(MOTOR_B_IN3, HIGH);
-      digitalWrite(MOTOR_B_IN4, LOW);
-      }
+  digitalWrite(MOTOR_A_IN1, LOW);
+  digitalWrite(MOTOR_A_IN2, HIGH);
+  analogWrite(MOTOR_B_ENB, 30);
+  digitalWrite(MOTOR_B_IN3, HIGH);
+  digitalWrite(MOTOR_B_IN4, LOW);
+}
 
 
 void br(int speed) {
   analogWrite(MOTOR_A_ENA, 10);
-    digitalWrite(MOTOR_A_IN1, HIGH);
-      digitalWrite(MOTOR_A_IN2, LOW);
-        analogWrite(MOTOR_B_ENB, speed);
-    digitalWrite(MOTOR_B_IN3, LOW);
-      digitalWrite(MOTOR_B_IN4, HIGH);
-      }
-      void bl(int speed) {
-        analogWrite(MOTOR_A_ENA, speed);
-          digitalWrite(MOTOR_A_IN1, HIGH);
-      digitalWrite(MOTOR_A_IN2, LOW);
-        analogWrite(MOTOR_B_ENB, 10);
-          digitalWrite(MOTOR_B_IN3, LOW);
-            digitalWrite(MOTOR_B_IN4, HIGH);
-      }
-      void nichan() {
-        int center_val = analogRead(LDR_CENTER_PIN);
-          int left_val = analogRead(LDR_LEFT_PIN)  ;
-            int right_val = analogRead(LDR_RIGHT_PIN);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, speed);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+void bl(int speed) {
+  analogWrite(MOTOR_A_ENA, speed);
+  digitalWrite(MOTOR_A_IN1, HIGH);
+  digitalWrite(MOTOR_A_IN2, LOW);
+  analogWrite(MOTOR_B_ENB, 10);
+  digitalWrite(MOTOR_B_IN3, LOW);
+  digitalWrite(MOTOR_B_IN4, HIGH);
+}
+void nichan() {
+  int center_val = analogRead(LDR_CENTER_PIN);
+  int left_val = analogRead(LDR_LEFT_PIN)  ;
+  int right_val = analogRead(LDR_RIGHT_PIN) ;
+
+
+center_val = map (center_val,0,901,700,901);
+left_val = map(left_val,150,1020,700,835);
+right_val = map(right_val,70,1015,700,901);
 
   double error = setpoint - center_val;
-    integral += error;
-      double derivative = error - last_error;
-        last_error = error;
+  integral += error;
+  double derivative = error - last_error;
+  last_error = error;
 
   double correction = (Kp * error) + (Ki * integral) + (Kd * derivative);
 
   int left_speed = 255 - correction;
-    int right_speed = 255 + correction;
+  int right_speed = 255 + correction;
 
   analogWrite(MOTOR_A_ENA, left_speed);
-    analogWrite(MOTOR_B_ENB, right_speed);
+  analogWrite(MOTOR_B_ENB, right_speed);
 
   if (center_val > 900)
-    {
-        stoprobot();
+  {
+    stoprobot();
 
     m0 = 0;
-      }
-        else {
-      if (center_val > left_val && center_val > right_val) {
-            forward(left_speed);
-          } else if (left_val > center_val && left_val > right_val) {
-                turn_left(left_speed);
-              } else if (right_val > center_val && right_val > left_val) {
-              turn_right(right_speed);
-                  }
-                //  Serial.print("Fmoyen:  ");
-                    //  Serial.print(Fmoyen);
-                  Serial.print("center_val:  ");
-                      Serial.print(center_val);
-                    Serial.print("  ");
-                        Serial.print("left_val:  ");
-                      Serial.print(left_val);
-                          Serial.print("   ");
-                        Serial.print("right_val:  ");
-                            Serial.println(right_val);
+  }
+  else {
+    if (center_val > left_val && center_val > right_val) {
+      forward(left_speed);
+    } else if (left_val > center_val && left_val > right_val) {
+      turn_left(left_speed);
+    } else if (right_val > center_val && right_val > left_val) {
+      turn_right(right_speed);
+    }
+    //  Serial.print("Fmoyen:  ");
+    //  Serial.print(Fmoyen);
+    Serial.print("center_val:  ");
+    Serial.print(center_val);
+    Serial.print("  ");
+    Serial.print("left_val:  ");
+    Serial.print(left_val);
+    Serial.print("   ");
+    Serial.print("right_val:  ");
+    Serial.println(right_val);
 
   }
-  }
-  void lor() {
-    int B1_center_val = analogRead(LDR_B1_PIN);
-      int B2_right_val = analogRead(LDR_B2_PIN);
-        int B3_left_val = analogRead(LDR_B3_PIN) + 30;
+}
+void lor() {
+  int B1_center_val = analogRead(LDR_B1_PIN);
+  int B2_right_val = analogRead(LDR_B2_PIN);
+  int B3_left_val = analogRead(LDR_B3_PIN) + 30;
 
   double error = setpoint - B1_center_val;
-    integral += error;
-      double derivative = error - last_error;
-        last_error = error;
+  integral += error;
+  double derivative = error - last_error;
+  last_error = error;
 
   double correction = (Kp * error) + (Ki * integral) + (Kd * derivative);
 
   int left_speed = 255 - correction;
-    int right_speed = 255 + correction;
+  int right_speed = 255 + correction;
 
   analogWrite(MOTOR_A_ENA, right_speed);
-    analogWrite(MOTOR_B_ENB, left_speed);
+  analogWrite(MOTOR_B_ENB, left_speed);
 
   if (B1_center_val > B3_left_val && B1_center_val > B2_right_val) {
-      backward(B3_left_val);
-        } else if (B3_left_val > B1_center_val && B3_left_val > B2_right_val) {
-      bl(left_speed);
-        } else if (B2_right_val > B1_center_val && B2_right_val > B3_left_val) {
-            br(right_speed);
-        }
+    backward(B3_left_val);
+  } else if (B3_left_val > B1_center_val && B3_left_val > B2_right_val) {
+    bl(left_speed);
+  } else if (B2_right_val > B1_center_val && B2_right_val > B3_left_val) {
+    br(right_speed);
+  }
 
   Serial.print("  B1:  ");
-    Serial.print(B1_center_val);
-      Serial.print("    ");
-        Serial.print("B2:  ");
-    Serial.print(B2_right_val);
-      Serial.print("    ");
-        Serial.print("B3:  ");
-          Serial.println(B3_left_val);
+  Serial.print(B1_center_val);
+  Serial.print("    ");
+  Serial.print("B2:  ");
+  Serial.print(B2_right_val);
+  Serial.print("    ");
+  Serial.print("B3:  ");
+  Serial.println(B3_left_val);
 
 
+}
+
+void Shoulder_Middle() {
+
+  shoulderServo.write(153);
+  delay(20);
+}
+
+
+void Shoulder_Down() {
+
+  shoulderServo.write(165);
+  delay(20);
+}
+
+
+void Shoulder_UP() {
+
+  shoulderServo.write(132);
+  delay(20);
+}
+
+
+void Base_Middle() {
+
+  baseServo.write(63);
+  delay(20);
+
+}
+void Base_LEFT() {
+
+  baseServo.write(140);
+  delay(20);
+
+}
+
+
+void Base_RIGHT() {
+
+  baseServo.write(0);
+  delay(20);
+}
+
+
+void Base_Ball_1() {
+
+  baseServo.write(38);
+  delay(20);
+}
+
+
+void Base_Ball_2() {
+
+  baseServo.write(90);
+  delay(20);
+}
+
+void Base_Ball_3() {
+
+  baseServo.write(68);
+  delay(20);
+}
+
+void topOpenLeft() {
+  setServoAngle(topServo, TOP_OPEN_ANGLE_LEFT);
+}
+void topOpenRight() {
+  setServoAngle(topServo, TOP_OPEN_ANGLE_RIGHT);
+}
+
+void topClose() {
+  setServoAngle(topServo, TOP_CLOSE_ANGLE);
+}
+
+void bottomOpen() {
+  setServoAngle(bottomServo, BOTTOM_OPEN_ANGLE);
+  delay(1000);
+}
+
+void bottomClose() {
+  setServoAngle(bottomServo, BOTTOM_CLOSE_ANGLE);
 }
 
 
 
 
-
-
-void Shoulder_UP() {
- 
-shoulderServo.write(132);
-delay(20);
-        }
-
-
-void Base_Middle() {
-  baseServo.write(60);
-    delay(20);
-    }
-    void Base_LEFT() {
-
-baseServo.write(133);
-delay(20);
-
-    }
-
-
-void Base_RIGHT() {
-
-baseServo.write(0);
-delay(20);
-      }
-
-
-void Base_Ball_1() {
-
-baseServo.write(40);
-delay(20);
-      }
-
-
-void Base_Ball_2() {
-
-baseServo.write(90);
-delay(20);
-      }
-
-void topOpenLeft() {
-  setServoAngle(topServo, TOP_OPEN_ANGLE_LEFT);
-  }
-  void topOpenRight() {
-    setServoAngle(topServo, TOP_OPEN_ANGLE_RIGHT);
-    }
-
-void topClose() {
-  setServoAngle(topServo, TOP_CLOSE_ANGLE);
-  }
-
-void bottomOpen() {
-  setServoAngle(bottomServo, BOTTOM_OPEN_ANGLE);
-    delay(1000);
-    }
-    
-void bottomClose() {
-  setServoAngle(bottomServo, BOTTOM_CLOSE_ANGLE);
-  }
-
-
-
- 
-void train_stop(){
-   trainServo.write(90);
+void train_stop() {
+  trainServo.write(90);
 }
 void train_more() {
   if (i == 1) {
 
     trainServo.write(100);
-        delay(1000);
+    delay(3000);
 
     trainServo.write(90);
-        i = 0;
-    }
-    }
+    i = 0;
+  }
+}
 
 void train_less() {
   if (i == 1) {
-      trainServo.write(0);
-          delay(1000);
-        trainServo.write(90);
-            i = 0;
-        }
-        }
+    trainServo.write(0);
+    delay(3001);
+    trainServo.write(90);
+    i = 0;
+  }
+}
 
-void Shoulder_Down() {
-
-shoulderServo.write(160);
-delay(20);
-        }
 
 
 void mission0() {
+  forward()
+  bottomClose();
   nichan();
+  delay(500);
 
 
 
 }
 void mission1() {
+  bottomClose();
+  i = 1;
 
   Shoulder_Down();
-    delay(600);
-      Base_Ball_1();
-        delay(600);
-    topOpenLeft();
-      delay(600);
-        Shoulder_UP();
-          delay(600);
+  delay(1600);
+  topOpenLeft();
+  delay(1600);
+  Base_Ball_1();
+  delay(1600);
+  Shoulder_UP();
+  delay(1600);
 
   topClose();
-    delay(600);
+  delay(1600);
+
+  Shoulder_Down();
+  delay(1600);
+  Shoulder_UP();
+  delay(1600);
 
   Base_RIGHT();
-    delay(600);
-i=1;
+  delay(1600);
+  i = 1;
   train_more();
-    delay(600);
-      bottomOpen();
-        delay(600);
-    bottomClose();
-      i = 1;
-        delay(600);
-          train_less();
-      delay(600);
-        Base_Ball_1();
-          delay(600);
-            Shoulder_Down();
-        delay(600);
-          Base_Middle();
+  delay(1600);
+  bottomOpen();
+  delay(1600);
+  bottomClose();
+  i = 1;
+  delay(1600);
+  train_less();
+  delay(1600);
+  Base_Ball_1();
+  delay(1600);
+  Shoulder_Middle();
+  delay(1600);
+  Base_Middle();
 
 
 
 }
 void mission2() {
+  bottomClose();
+    delay(1600);
+    i=1;
+  train_more();
+  delay(1600);
+  topOpenRight();
+  delay(1600);
+    i=1;
+  train_less();
+  delay(1600);
   Base_Ball_2();
-   delay(600);
- 
-    topOpenRight();
-     delay(600);
- 
-      Shoulder_UP();
-       delay(600);
- 
-        topClose();
-         delay(600);
- 
-    Base_LEFT();
-     delay(600);
- 
-      i = 1;
-        train_more();
-         delay(600);
- 
-          bottomOpen();
-           delay(600);
- 
-      bottomClose();
-       delay(600);
- 
-        i = 1;
-          train_less();
-           delay(600);
- 
-            Base_Ball_2();
-             delay(600);
- 
-        Shoulder_Down();
-         delay(600);
-          Base_Middle();
-           delay(600);
- 
+  delay(1600);
+
+
+  Shoulder_UP();
+  delay(1600);
+
+  topClose();
+  delay(1600);
+
+  Shoulder_Down();
+  delay(1600);
+
+  Shoulder_UP();
+  delay(1600);
+
+  Base_LEFT();
+  delay(1600);
+
+  i = 1;
+  train_more();
+  delay(1600);
+
+  bottomOpen();
+  delay(1600);
+
+  bottomClose();
+  delay(1600);
+
+  i = 1;
+  train_less();
+  delay(1600);
+
+  Base_Ball_2();
+  delay(1600);
+
+  Shoulder_Middle();
+  delay(1600);
+  Base_Middle();
+  delay(1600);
+
 
 }
 void mission3() {
+  bottomClose();
+  Base_Ball_3();
   i = 1;
-    train_more();
-    delay(600);
-      topOpenRight();
-       delay(600);
-        Shoulder_UP();
-         delay(600);
-    topClose();
-     delay(600);
-      Base_RIGHT();
-       delay(600);
-        bottomOpen();
-         delay(200);
-          bottomClose();
-           delay(600);
-      i = 1;
-        train_less();
-         delay(600);
-          Base_Ball_1();
-           delay(600);
-            Base_Middle();
-             delay(600);
+  train_more();
+  delay(1600);
+  topOpenRight();
+  delay(1600);
+  Shoulder_UP();
+  delay(1600);
+  topClose();
+  delay(1600);
+  Shoulder_Down();
+  delay(1600);
+  Shoulder_UP();
+  delay(1600);
+  Base_RIGHT();
+  delay(1600);
+  bottomOpen();
+  delay(1200);
+  bottomClose();
+  delay(1600);
+  i = 1;
+  train_less();
+  delay(1600);
+  Base_Ball_1();
+  delay(1600);
+  Base_Middle();
+  delay(1600);
 
 }
 
 void mission4() {
+  bottomClose();
+  delay(1600);
   lor();
-  }
-  void setup() {
-    topServo.attach(TOP_SERVO_PIN);
-      bottomServo.attach(BOTTOM_SERVO_PIN);
-        shoulderServo.attach(SHOULDER_SERVO_PIN);
-    baseServo.attach(BASE_SERVO_PIN);
-      trainServo.attach(TRAIN_SERVO_PIN);
-        train_less();
-        train_stop();
+}
+void setup() {
+  topServo.attach(TOP_SERVO_PIN);
+  bottomServo.attach(BOTTOM_SERVO_PIN);
+  shoulderServo.attach(SHOULDER_SERVO_PIN);
+  baseServo.attach(BASE_SERVO_PIN);
+  trainServo.attach(TRAIN_SERVO_PIN);
+  train_less();
+  train_stop();
 
-shoulderServo.write(130);
-baseServo.write(65);
-
+  shoulderServo.write(130);
+  baseServo.write(65);
+  topServo.write(0);
+  bottomServo.write(0);
 
 
   pinMode(MOTOR_A_ENA, OUTPUT);
-    pinMode(MOTOR_A_IN1, OUTPUT);
-      pinMode(MOTOR_A_IN2, OUTPUT);
-        pinMode(MOTOR_B_ENB, OUTPUT);
-    pinMode(MOTOR_B_IN3, OUTPUT);
-      pinMode(MOTOR_B_IN4, OUTPUT);
+  pinMode(MOTOR_A_IN1, OUTPUT);
+  pinMode(MOTOR_A_IN2, OUTPUT);
+  pinMode(MOTOR_B_ENB, OUTPUT);
+  pinMode(MOTOR_B_IN3, OUTPUT);
+  pinMode(MOTOR_B_IN4, OUTPUT);
 
   pinMode(LDR_CENTER_PIN, INPUT);
-    pinMode(LDR_LEFT_PIN, INPUT);
-      pinMode(LDR_RIGHT_PIN, INPUT);
-        pinMode(LDR_B1_PIN, INPUT);
-    pinMode(LDR_B2_PIN, INPUT);
-      pinMode(LDR_B3_PIN, INPUT);
-        Serial.begin(9600);
+  pinMode(LDR_LEFT_PIN, INPUT);
+  pinMode(LDR_RIGHT_PIN, INPUT);
+  pinMode(LDR_B1_PIN, INPUT);
+  pinMode(LDR_B2_PIN, INPUT);
+  pinMode(LDR_B3_PIN, INPUT);
+  Serial.begin(9600);
 
 
 }
 
 
 void loop() {
-  Base_Middle();
-  i=1;
-train_less();
-train_stop();
-Shoulder_Down();
-delay(2000);
-mission1();
-delay(1000);
- mission2();
-delay(1000);
- mission3();
- delay(1000);
 
+  if (m0 == 1) {
+    Shoulder_UP();
+  
+    mission0();
 
- 
-//  if (m0 == 1) {
-//      mission0();
-//
-//    m1 = 1;
-//      }
-//          m1 = 1;
-//          if (m1 == 1) {
-//          mission1();
-//          m1 = 0;
-//                m2 = 1;
-//              }
-//              m2 = 1;
-        //    if (m2 == 1) {
-        //      mission2();
-        //      m2 = 0;
-        //      m3 = 1;
-        //    }
-        //    if (m3 == 1) {
-        //      mission3();
-        //      m3 = 0;
-        //      m4 = 1;
-        //    }
-        //    if (m4 == 1) {
-        //      mission1();
-        //      m4 = 0;
-        //  }
-        }
+    m1 = 1;
+  }
+  else {
+    train_stop();
+    Base_Middle();
+    i = 1;
+    train_less();
+    Shoulder_Down();
+    delay(2000);
+    mission1();
+    delay(1000);
+    mission2();
+    delay(1000);
+    mission3();
+    delay(1000);
+
+  }
+  }
+
+  //
+  //  if (m1 == 1) {
+  //    mission1();
+  //    m1 = 0;
+  //    m2 = 1;
+  //  }
+  //  m2 = 1;
+  //  if (m2 == 1) {
+  //    mission2();
+  //    m2 = 0;
+  //    m3 = 1;
+  //  }
+  //  if (m3 == 1) {
+  //    mission3();
+  //    m3 = 0;
+  //    m4 = 1;
+  //  }
+  //  if (m4 == 1) {
+  //    mission1();
+  //    m4 = 0;
+  //  }
+//}
