@@ -1,4 +1,9 @@
 #include <Servo.h>
+#include <Ultrasonic.h>
+
+Ultrasonic ultrasonic1(8, 9);
+
+
 // Motor pins
 const int MOTOR_A_ENA = 2;
 const int MOTOR_A_IN1 = 3;
@@ -8,8 +13,8 @@ const int MOTOR_B_IN3 = 5;
 const int MOTOR_B_IN4 = 6;
 
 // Servo angles
-const int TOP_OPEN_ANGLE_LEFT = 140;
-const int TOP_OPEN_ANGLE_RIGHT = 140;
+const int TOP_OPEN_ANGLE_LEFT = 130;
+const int TOP_OPEN_ANGLE_RIGHT = 130;
 const int TOP_CLOSE_ANGLE = 0;
 const int BOTTOM_OPEN_ANGLE = 100;
 const int BOTTOM_CLOSE_ANGLE = 0;
@@ -57,11 +62,11 @@ Servo trainServo;
 void setServoAngle(Servo& servo, const int angle) {
   servo.write(angle);
 }
-void forward(int speedA,int speedB) {
-  analogWrite(MOTOR_A_ENA, speedA);
+void forward(int speed) {
+  analogWrite(MOTOR_A_ENA, speed );
   digitalWrite(MOTOR_A_IN1, LOW);
   digitalWrite(MOTOR_A_IN2, HIGH);
-  analogWrite(MOTOR_B_ENB, speedB);
+  analogWrite(MOTOR_B_ENB, speed );
   digitalWrite(MOTOR_B_IN3, HIGH);
   digitalWrite(MOTOR_B_IN4, LOW);
 }
@@ -120,12 +125,13 @@ void bl(int speed) {
 void nichan() {
   int center_val = analogRead(LDR_CENTER_PIN);
   int left_val = analogRead(LDR_LEFT_PIN)  ;
-  int right_val = analogRead(LDR_RIGHT_PIN) ;
+  int right_val = analogRead(LDR_RIGHT_PIN) - 40 ;
+  //
+  //center_val = map (center_val , 31 , 1015, 800, 900 );
+  // left_val = map (left_val , 28 , 1020, 800, 900 );
+  //right_val = map (right_val , 36 , 988, 800, 900 );
+  //
 
-
-center_val = map (center_val,0,901,700,901);
-left_val = map(left_val,150,1020,700,835);
-right_val = map(right_val,70,1015,700,901);
 
   double error = setpoint - center_val;
   integral += error;
@@ -140,7 +146,7 @@ right_val = map(right_val,70,1015,700,901);
   analogWrite(MOTOR_A_ENA, left_speed);
   analogWrite(MOTOR_B_ENB, right_speed);
 
-  if (center_val > 900)
+  if (center_val > 815)
   {
     stoprobot();
 
@@ -154,23 +160,26 @@ right_val = map(right_val,70,1015,700,901);
     } else if (right_val > center_val && right_val > left_val) {
       turn_right(right_speed);
     }
-    //  Serial.print("Fmoyen:  ");
-    //  Serial.print(Fmoyen);
-    Serial.print("center_val:  ");
-    Serial.print(center_val);
-    Serial.print("  ");
-    Serial.print("left_val:  ");
-    Serial.print(left_val);
-    Serial.print("   ");
-    Serial.print("right_val:  ");
-    Serial.println(right_val);
-
   }
+  //  Serial.print("Fmoyen:  ");
+  //  Serial.print(Fmoyen);
+  Serial.print("center_val:  ");
+  Serial.print(center_val);
+  Serial.print("  ");
+  Serial.print("left_val:  ");
+  Serial.print(left_val);
+  Serial.print("   ");
+  Serial.print("right_val:  ");
+  Serial.println(right_val);
+
 }
+
 void lor() {
   int B1_center_val = analogRead(LDR_B1_PIN);
   int B2_right_val = analogRead(LDR_B2_PIN);
   int B3_left_val = analogRead(LDR_B3_PIN) + 30;
+
+
 
   double error = setpoint - B1_center_val;
   integral += error;
@@ -207,33 +216,36 @@ void lor() {
 
 void Shoulder_Middle() {
 
-  shoulderServo.write(153);
+  shoulderServo.write(148);
   delay(20);
+  Serial.println("Shoulder_Middle");
 }
 
 
 void Shoulder_Down() {
-
+  Serial.println("Shoulder_Down");
   shoulderServo.write(165);
   delay(20);
 }
 
 
 void Shoulder_UP() {
-
-  shoulderServo.write(132);
+  Serial.println("Shoulder_UP");
+  shoulderServo.write(100);
   delay(20);
+
 }
 
 
 void Base_Middle() {
-
+  Serial.println("basemiddle");
   baseServo.write(63);
   delay(20);
 
 }
-void Base_LEFT() {
 
+void Base_LEFT() {
+  Serial.println("baseleft");
   baseServo.write(140);
   delay(20);
 
@@ -241,48 +253,88 @@ void Base_LEFT() {
 
 
 void Base_RIGHT() {
-
+  Serial.println("baseright");
   baseServo.write(0);
   delay(20);
+
 }
 
 
 void Base_Ball_1() {
-
+  Serial.println("ball1");
+  baseServo.write(50);
+  delay(500);
   baseServo.write(38);
+  delay(20);
+
+}
+
+void Base_Ball_1_BACK() {
+  Serial.println("ballback1");
+  baseServo.write(10);
+  delay(500);
+  baseServo.write(20);
+  delay(500);
+  baseServo.write(38);
+  delay(20);
+  baseServo.write(45);
+  delay(20);
+  baseServo.write(54);
   delay(20);
 }
 
-
 void Base_Ball_2() {
+  Serial.println("ball2");
+  baseServo.write(92);
+  delay(20);
+}
 
-  baseServo.write(90);
+void Base_Ball_2_BACK() {
+  Serial.println("ball2back");
+  baseServo.write(130);
+  delay(500);
+  baseServo.write(110);
+  delay(500);
+  baseServo.write(97);
+  delay(500);
+  baseServo.write(85);
+  delay(20);
+  baseServo.write(74);
+  delay(20);
+  baseServo.write(70);
   delay(20);
 }
 
 void Base_Ball_3() {
-
+  Serial.println("ball3");
+  baseServo.write(77);
+  delay(500);
   baseServo.write(68);
   delay(20);
 }
 
 void topOpenLeft() {
+  Serial.println("topopen");
   setServoAngle(topServo, TOP_OPEN_ANGLE_LEFT);
 }
 void topOpenRight() {
+  Serial.println("topopen");
   setServoAngle(topServo, TOP_OPEN_ANGLE_RIGHT);
 }
 
 void topClose() {
+  Serial.println("topclose");
   setServoAngle(topServo, TOP_CLOSE_ANGLE);
 }
 
 void bottomOpen() {
+  Serial.println("BT_open");
   setServoAngle(bottomServo, BOTTOM_OPEN_ANGLE);
   delay(1000);
 }
 
 void bottomClose() {
+  Serial.println("BT_close");
   setServoAngle(bottomServo, BOTTOM_CLOSE_ANGLE);
 }
 
@@ -290,11 +342,12 @@ void bottomClose() {
 
 
 void train_stop() {
+  Serial.println("train_stop");
   trainServo.write(90);
 }
 void train_more() {
   if (i == 1) {
-
+    Serial.println("train_more");
     trainServo.write(100);
     delay(3000);
 
@@ -305,6 +358,7 @@ void train_more() {
 
 void train_less() {
   if (i == 1) {
+    Serial.println("train_less");
     trainServo.write(0);
     delay(3001);
     trainServo.write(90);
@@ -315,70 +369,76 @@ void train_less() {
 
 
 void mission0() {
-  forward()
-  bottomClose();
+  Serial.println("mission0");
   nichan();
-  delay(500);
+  bottomClose();
 
 
 
 }
 void mission1() {
+
   bottomClose();
   i = 1;
 
   Shoulder_Down();
-  delay(1600);
+  delay(600);
+
   topOpenLeft();
-  delay(1600);
+  delay(600);
+
   Base_Ball_1();
-  delay(1600);
+  delay(600);
+
   Shoulder_UP();
-  delay(1600);
+  delay(600);
 
   topClose();
-  delay(1600);
+  delay(600);
 
   Shoulder_Down();
-  delay(1600);
+  delay(600);
+
   Shoulder_UP();
   delay(1600);
 
   Base_RIGHT();
   delay(1600);
+
   i = 1;
   train_more();
   delay(1600);
+
   bottomOpen();
-  delay(1600);
+  delay(1000);
+
   bottomClose();
+  delay(1100);
+
   i = 1;
-  delay(1600);
   train_less();
   delay(1600);
-  Base_Ball_1();
+
+  Base_Ball_1_BACK();
   delay(1600);
+
   Shoulder_Middle();
   delay(1600);
-  Base_Middle();
 
+  Base_Middle();
+  delay(500);
 
 
 }
 void mission2() {
   bottomClose();
-    delay(1600);
-    i=1;
-  train_more();
   delay(1600);
-  topOpenRight();
-  delay(1600);
-    i=1;
-  train_less();
-  delay(1600);
+
   Base_Ball_2();
   delay(1600);
 
+  topOpenLeft();
+  delay(600);
 
   Shoulder_UP();
   delay(1600);
@@ -409,7 +469,7 @@ void mission2() {
   train_less();
   delay(1600);
 
-  Base_Ball_2();
+  Base_Ball_2_BACK();
   delay(1600);
 
   Shoulder_Middle();
@@ -462,6 +522,7 @@ void setup() {
   shoulderServo.attach(SHOULDER_SERVO_PIN);
   baseServo.attach(BASE_SERVO_PIN);
   trainServo.attach(TRAIN_SERVO_PIN);
+
   train_less();
   train_stop();
 
@@ -492,49 +553,65 @@ void setup() {
 
 void loop() {
 
+
   if (m0 == 1) {
     Shoulder_UP();
-  
+
     mission0();
 
     m1 = 1;
   }
+
   else {
     train_stop();
+
     Base_Middle();
+
     i = 1;
     train_less();
+
     Shoulder_Down();
-    delay(2000);
+    delay(1000);
+
     mission1();
     delay(1000);
+
     mission2();
     delay(1000);
+
     mission3();
+    delay(1000);
+   mission4();
     delay(1000);
 
   }
-  }
 
-  //
-  //  if (m1 == 1) {
-  //    mission1();
-  //    m1 = 0;
-  //    m2 = 1;
-  //  }
-  //  m2 = 1;
-  //  if (m2 == 1) {
-  //    mission2();
-  //    m2 = 0;
-  //    m3 = 1;
-  //  }
-  //  if (m3 == 1) {
-  //    mission3();
-  //    m3 = 0;
-  //    m4 = 1;
-  //  }
-  //  if (m4 == 1) {
-  //    mission1();
-  //    m4 = 0;
-  //  }
-//}
+
+}
+
+//
+//  if (m1 == 1) {
+//    mission1();
+//    m1 = 0;
+//    m2 = 1;
+//  }
+//  m2 = 1;
+//  if (m2 == 1) {
+//    mission2();
+//    m2 = 0;
+//    m3 = 1;
+//  }
+//  if (m3 == 1) {
+//    mission3();
+//    m3 = 0;
+//    m4 = 1;
+//  }
+//  if (m4 == 1) {
+//    mission1();
+//    m4 = 0;
+//  }
+//}void setup() {
+// put your setup code here, to run once:
+
+
+
